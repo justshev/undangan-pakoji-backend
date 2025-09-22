@@ -6,21 +6,21 @@
 
 generator client {
   provider = "prisma-client-js"
-  
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Guest {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   name            String
   email           String?
-  totalInvited    Int      @default(0)
-  confirmedGuests Int      @default(0)
-  qrCodeToken     String?  @unique
-  isArrived       Boolean  @default(false)
+  totalInvited    Int       @default(0)
+  confirmedGuests Int       @default(0)
+  qrCodeToken     String?   @unique
+  isArrived       Boolean   @default(false)
   arrivalTime     DateTime?
 }
