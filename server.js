@@ -9,14 +9,11 @@ const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(bodyParser.json());
-
-// Get all guests
 app.get("/api/guests", async (req, res) => {
   const guests = await prisma.guest.findMany();
   res.json(guests);
 });
 
-// Confirm attendance
 app.post("/api/guests/confirm/:id", async (req, res) => {
   const { confirmedGuests } = req.body;
   const token = uuidv4();
@@ -35,7 +32,6 @@ app.post("/api/guests/confirm/:id", async (req, res) => {
   }
 });
 
-// Validate QR Code
 app.get("/api/guests/validate/:token", async (req, res) => {
   try {
     const guest = await prisma.guest.update({
@@ -50,7 +46,6 @@ app.get("/api/guests/validate/:token", async (req, res) => {
     res.status(404).json({ error: "Invalid QR" });
   }
 });
-// Tambah guest baru
 app.post("/api/guests", async (req, res) => {
   const { name, email, totalInvited } = req.body;
 
