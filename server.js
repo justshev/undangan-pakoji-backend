@@ -9,13 +9,15 @@ const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(bodyParser.json());
+
 app.get("/api/guests", async (req, res) => {
   const guests = await prisma.guest.findMany();
-  res.json(guests);
+  return res.json(guests);
 });
 
 app.post("/api/guests/confirm/:id", async (req, res) => {
   const { confirmedGuests } = req.body;
+  console.log(confirmedGuests);
   const token = uuidv4();
 
   try {
@@ -32,8 +34,27 @@ app.post("/api/guests/confirm/:id", async (req, res) => {
   }
 });
 
+app.get("/api/guests/:guestId", async (req, res) => {
+  const { guestId } = req.params;
+
+  try {
+    const guest = await prisma.guest.findUnique({
+      where: {
+        id: guestId,
+      },
+      select: {
+        name: true,
+      },
+    });
+    return res.status(200).json({ guest });
+  } catch (err) {
+    res.status(400).json({ error: "Guest not found" });
+  }
+});
+
 app.get("/api/guests/validate/:token", async (req, res) => {
   try {
+    console.log(req.params);
     const guest = await prisma.guest.update({
       where: { qrCodeToken: req.params.token },
       data: {
@@ -46,6 +67,7 @@ app.get("/api/guests/validate/:token", async (req, res) => {
     res.status(404).json({ error: "Invalid QR" });
   }
 });
+
 app.post("/api/guests", async (req, res) => {
   const { name, email, totalInvited } = req.body;
 
@@ -65,4 +87,4 @@ app.post("/api/guests", async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log("Backend running"));
+app.listen(3001, () => console.log("Backend running on port 3001"));
