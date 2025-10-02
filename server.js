@@ -28,9 +28,9 @@ app.post("/api/guests/confirm/:id", async (req, res) => {
         qrCodeToken: token,
       },
     });
-    res.json({ qrCodeToken: token, guest });
+    return res.json({ qrCodeToken: token, guest });
   } catch (err) {
-    res.status(400).json({ error: "Guest not found" });
+    return res.status(400).json({ error: "Guest not found" });
   }
 });
 
@@ -48,7 +48,7 @@ app.get("/api/guests/:guestId", async (req, res) => {
     });
     return res.status(200).json({ guest });
   } catch (err) {
-    res.status(400).json({ error: "Guest not found" });
+    return res.status(400).json({ error: "Guest not found" });
   }
 });
 
@@ -62,9 +62,35 @@ app.get("/api/guests/validate/:token", async (req, res) => {
         arrivalTime: new Date(),
       },
     });
-    res.json({ success: true, guest });
+    return res.json({ success: true, guest });
   } catch (err) {
-    res.status(404).json({ error: "Invalid QR" });
+    return res.status(404).json({ error: "Invalid QR" });
+  }
+});
+
+app.post("/api/comment", async (req, res) => {
+  try {
+    const { name, message } = req.body;
+    console.log(name, message);
+    const comment = await prisma.comments.create({
+      data: {
+        name,
+        message,
+      },
+    });
+    return res.status(200).json({ success: true, comment });
+  } catch (err) {
+    return res.status(404).json({ error: "Failed add comment" });
+  }
+});
+
+app.get("/api/comments", async (req, res) => {
+  try {
+    const comments = await prisma.comments.findMany();
+    console.log(comments);
+    return res.status(200).json(comments);
+  } catch (err) {
+    return res.status(404).json({ error: "Failed get comment data" });
   }
 });
 
@@ -79,9 +105,9 @@ app.post("/api/guests", async (req, res) => {
         totalInvited,
       },
     });
-    res.json({ success: true, guest });
+    return res.json({ success: true, guest });
   } catch (err) {
-    res
+    return res
       .status(400)
       .json({ error: "Gagal menambahkan tamu", detail: err.message });
   }

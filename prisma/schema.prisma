@@ -24,3 +24,9 @@ model Guest {
   isArrived       Boolean   @default(false)
   arrivalTime     DateTime?
 }
+
+model Comments {
+  id      String @id @default(uuid())
+  name    String
+  message String
+}
