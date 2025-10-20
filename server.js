@@ -12,19 +12,21 @@ app.use(bodyParser.json());
 
 app.get("/api/guests", async (req, res) => {
   const guests = await prisma.guest.findMany();
+  console.log(guests);
   return res.json(guests);
 });
 
 app.post("/api/guests/confirm/:id", async (req, res) => {
   const { confirmedGuests } = req.body;
-  console.log(confirmedGuests);
+  const { id } = req.params;
   const token = uuidv4();
 
+  console.log("id: ", id);
   try {
     const guest = await prisma.guest.update({
-      where: { id: req.params.id },
+      where: { id },
       data: {
-        confirmedGuests,
+        confirmedGuests: Number(confirmedGuests),
         qrCodeToken: token,
       },
     });
@@ -46,7 +48,7 @@ app.get("/api/guests/:guestId", async (req, res) => {
         name: true,
       },
     });
-    return res.status(200).json({ guest });
+    return res.status(200).json(guest);
   } catch (err) {
     return res.status(400).json({ error: "Guest not found" });
   }
@@ -71,13 +73,14 @@ app.get("/api/guests/validate/:token", async (req, res) => {
 app.post("/api/comment", async (req, res) => {
   try {
     const { name, message } = req.body;
-    console.log(name, message);
-    const comment = await prisma.comments.create({
+
+    const comment = await prisma.comment.create({
       data: {
         name,
         message,
       },
     });
+
     return res.status(200).json({ success: true, comment });
   } catch (err) {
     return res.status(404).json({ error: "Failed add comment" });
@@ -86,8 +89,7 @@ app.post("/api/comment", async (req, res) => {
 
 app.get("/api/comments", async (req, res) => {
   try {
-    const comments = await prisma.comments.findMany();
-    console.log(comments);
+    const comments = await prisma.comment.findMany();
     return res.status(200).json(comments);
   } catch (err) {
     return res.status(404).json({ error: "Failed get comment data" });
