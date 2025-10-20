@@ -21,12 +21,20 @@ model Guest {
   totalInvited    Int       @default(0)
   confirmedGuests Int       @default(0)
   qrCodeToken     String?   @unique
-  isArrived       Boolean   @default(false)
+  isArrived       Boolean?  @default(false)
   arrivalTime     DateTime?
+
+  // back relation
+  comments Comment[]
 }
 
-model Comments {
-  id      String @id @default(uuid())
+model Comment {
+  id      String  @id @default(uuid())
+  guestId String?
   name    String
   message String
+
+  guest Guest? @relation(fields: [guestId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([guestId])
 }
