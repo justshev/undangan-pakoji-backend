@@ -115,4 +115,20 @@ app.post("/api/guests", async (req, res) => {
   }
 });
 
+app.post("/api/guest/add", async (req, res) => {
+  const { name, totalInvited } = req.body;
+
+  try {
+    const guest = await prisma.guest.create({
+      data: {
+        name,
+        totalInvited: totalInvited.toString(),
+      },
+    });
+    return res.json({ success: true, guest });
+  } catch (err) {
+    return res.status(400).json({ error: "Failed add guest" });
+  }
+});
+
 app.listen(3001, () => console.log("Backend running on port 3001"));
