@@ -15,7 +15,7 @@ datasource db {
 }
 
 model Guest {
-  id              String    @id @default(uuid())
+  id              String    @id @default(uuid()) @db.Uuid
   name            String
   email           String?
   totalInvited    String    @default("0")
