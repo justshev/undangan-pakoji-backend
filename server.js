@@ -16,6 +16,42 @@ app.get("/api/guests", async (req, res) => {
   return res.json(guests);
 });
 
+// Update guest (e.g., name)
+app.patch("/api/guests/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, totalInvited, confirmedGuests, isArrived } = req.body || {};
+
+  try {
+    const updated = await prisma.guest.update({
+      where: { id },
+      data: {
+        ...(typeof name === "string" ? { name } : {}),
+        ...(typeof totalInvited !== "undefined"
+          ? { totalInvited: String(totalInvited) }
+          : {}),
+        ...(typeof confirmedGuests !== "undefined"
+          ? { confirmedGuests: Number(confirmedGuests) }
+          : {}),
+        ...(typeof isArrived !== "undefined" ? { isArrived: Boolean(isArrived) } : {}),
+      },
+    });
+    return res.status(200).json({ success: true, guest: updated });
+  } catch (err) {
+    return res.status(400).json({ error: "Failed to update guest" });
+  }
+});
+
+// Delete guest
+app.delete("/api/guests/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.guest.delete({ where: { id } });
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(400).json({ error: "Failed to delete guest" });
+  }
+});
+
 app.post("/api/guests/confirm/:id", async (req, res) => {
   const { confirmedGuests } = req.body;
   const { id } = req.params;
